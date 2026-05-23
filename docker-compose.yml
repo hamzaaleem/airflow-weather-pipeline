@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - airflow-network
+
+  airflow:
+    image: apache/airflow:2.8.1-python3.11
+    container_name: airflow
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'secret123'
+      AIRFLOW__CORE__PARALLELISM: 4
+      AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: 2
+      AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: 1
+      AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL: 60
+      AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: 60
+      AIRFLOW__WEBSERVER__WORKERS: 1
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    command: >
+      bash -c "airflow db init &&
+               airflow users create
+               --username admin
+               --password admin
+               --firstname Admin
+               --lastname User
+               --role Admin
+               --email admin@example.com &&
+               airflow scheduler &
+               airflow webserver --workers 1"
+    networks:
+      - airflow-network
+    mem_limit: 2g
+    cpus: 1.5
+
+  postgres_weather_db:
+    image: postgres:15
+    container_name: postgres_weather_db
+    environment:
+      POSTGRES_USER: weather
+      POSTGRES_PASSWORD: weather
+      POSTGRES_DB: weather_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - weather_data:/var/lib/postgresql/data
+    networks:
+      - airflow-network
+
+volumes:
+  postgres_data:
+  weather_data:
+
+networks:
+  airflow-network:
+    driver: bridge
