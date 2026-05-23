@@ -1,0 +1,16 @@
+# Airflow
+logs/
+airflow.db
+airflow-webserver.pid
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Environment
+.env
+
+# OS
+.DS_Store
+Thumbs.db
