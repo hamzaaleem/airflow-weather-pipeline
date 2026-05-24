@@ -1,5 +1,8 @@
 # 🌤️ Pakistan Weather ETL Pipeline — Apache Airflow
 
+
+<img width="1536" height="1024" alt="architechture diagram" src="https://github.com/user-attachments/assets/9d711d47-a794-407d-96a8-2f1dc6b711d8" />
+
 An automated batch ETL pipeline that pulls real-time weather data for 5 major Pakistani cities daily, transforms it, loads it into PostgreSQL, and visualizes it in Power BI — fully orchestrated with Apache Airflow running in Docker.
 
 ---
